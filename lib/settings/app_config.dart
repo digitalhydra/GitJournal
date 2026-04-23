@@ -23,16 +23,18 @@ class AppConfig extends ChangeNotifier {
 
   int version = 0;
 
-  bool proMode = false;
+  // UNLOCKED VERSION - All Pro features enabled by default
+  bool proMode = true;
 
-  var validateProMode = true;
+  var validateProMode = false;
 
   var debugLogLevel = 'v';
 
-  var experimentalSubfolders = false;
-  var experimentalMarkdownToolbar = false;
-  var experimentalAccounts = false;
-  var experimentalTagAutoCompletion = false;
+  // All experimental features enabled
+  var experimentalSubfolders = true;
+  var experimentalMarkdownToolbar = true;
+  var experimentalAccounts = true;
+  var experimentalTagAutoCompletion = true;
 
   void load(SharedPreferences pref) {
     onBoardingCompleted = pref.getBool("onBoardingCompleted") ?? false;

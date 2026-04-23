@@ -16,8 +16,12 @@ import 'package:universal_io/io.dart' show Platform;
 
 class GitJournalInAppPurchases {
   static Future<void> confirmProPurchaseBoot() async {
+    // UNLOCKED VERSION - Skip all IAP checks
+    Log.i("UNLOCKED BUILD - Pro features enabled");
     confirmPendingPurchases();
+    return;
 
+    /* Original code disabled:
     var appConfig = AppConfig.instance;
     if (!appConfig.validateProMode) {
       return;
@@ -33,6 +37,7 @@ class GitJournalInAppPurchases {
     }
 
     restorePurchases();
+    */
   }
 
   static Future<void> restorePurchases() async {

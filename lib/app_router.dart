@@ -7,13 +7,15 @@
 import 'package:flutter/material.dart';
 import 'package:function_types/function_types.dart';
 import 'package:git_setup/screens.dart';
-import 'package:gitjournal/account/account_screen.dart';
-import 'package:gitjournal/account/login_screen.dart';
+// HIDDEN - Login feature disabled
+// import 'package:gitjournal/account/account_screen.dart';
+// import 'package:gitjournal/account/login_screen.dart';
 import 'package:gitjournal/core/markdown/md_yaml_doc_codec.dart';
 import 'package:gitjournal/editors/note_editor.dart';
 import 'package:gitjournal/folder_listing/view/folder_listing.dart';
-import 'package:gitjournal/iap/purchase_screen.dart';
-import 'package:gitjournal/iap/purchase_thankyou_screen.dart';
+// UNLOCKED BUILD - Purchase screens removed
+// import 'package:gitjournal/iap/purchase_screen.dart';
+// import 'package:gitjournal/iap/purchase_thankyou_screen.dart';
 import 'package:gitjournal/logger/logger.dart';
 import 'package:gitjournal/repository.dart';
 import 'package:gitjournal/screens/error_screen.dart';
@@ -35,11 +37,13 @@ class AppRoute {
     FolderListingScreen.routePath,
     TagListingScreen.routePath,
     SettingsScreen.routePath,
-    LoginPage.routePath,
-    AccountScreen.routePath,
+    // HIDDEN - Login feature disabled
+    // LoginPage.routePath,
+    // AccountScreen.routePath,
     GitHostSetupScreen.routePath,
-    PurchaseScreen.routePath,
-    PurchaseThankYouScreen.routePath,
+    // UNLOCKED BUILD - Purchase routes removed
+    // PurchaseScreen.routePath,
+    // PurchaseThankYouScreen.routePath,
     ErrorScreen.routePath,
   ];
 }
@@ -123,10 +127,11 @@ class AppRouter {
         return const TagListingScreen();
       case SettingsScreen.routePath:
         return SettingsScreen();
-      case LoginPage.routePath:
-        return const LoginPage();
-      case AccountScreen.routePath:
-        return const AccountScreen();
+      // HIDDEN - Login feature disabled
+      // case LoginPage.routePath:
+      //   return const LoginPage();
+      // case AccountScreen.routePath:
+      //   return const AccountScreen();
       case GitHostSetupScreen.routePath:
         return GitJournalGitSetupScreen(
           repoFolderName: storageConfig.folderName,
@@ -134,10 +139,11 @@ class AppRouter {
         );
       case OnBoardingScreen.routePath:
         return const OnBoardingScreen();
-      case PurchaseScreen.routePath:
-        return PurchaseScreen();
-      case PurchaseThankYouScreen.routePath:
-        return PurchaseThankYouScreen();
+      // UNLOCKED BUILD - Purchase screens removed
+      // case PurchaseScreen.routePath:
+      //   return PurchaseScreen();
+      // case PurchaseThankYouScreen.routePath:
+      //   return PurchaseThankYouScreen();
       case ErrorScreen.routePath:
         return const ErrorScreen();
     }

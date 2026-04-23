@@ -125,6 +125,77 @@ class SettingsUIScreen extends StatelessWidget {
             Navigator.push(context, route);
           },
         ),
+        const Divider(),
+        const SettingsHeader("Text Size"),
+        ListTile(
+          title: const Text("Text Scale"),
+          subtitle: Text("${(settings.textScale * 100).toInt()}%"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove),
+                onPressed: settings.textScale > 0.5
+                    ? () {
+                        settings.textScale =
+                            (settings.textScale - settings.textScaleStep)
+                                .clamp(0.5, 3.0);
+                        settings.save();
+                      }
+                    : null,
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: settings.textScale < 3.0
+                    ? () {
+                        settings.textScale =
+                            (settings.textScale + settings.textScaleStep)
+                                .clamp(0.5, 3.0);
+                        settings.save();
+                      }
+                    : null,
+              ),
+            ],
+          ),
+        ),
+        ListTile(
+          title: const Text("Increment Step"),
+          subtitle: Text("${(settings.textScaleStep * 100).toInt()}%"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove),
+                onPressed: settings.textScaleStep > 0.1
+                    ? () {
+                        settings.textScaleStep =
+                            (settings.textScaleStep - 0.05).clamp(0.1, 0.5);
+                        settings.save();
+                      }
+                    : null,
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: settings.textScaleStep < 0.5
+                    ? () {
+                        settings.textScaleStep =
+                            (settings.textScaleStep + 0.05).clamp(0.1, 0.5);
+                        settings.save();
+                      }
+                    : null,
+              ),
+            ],
+          ),
+        ),
+        SwitchListTile(
+          title: const Text("Fixed Max Width"),
+          subtitle: const Text("Limit text width for better readability"),
+          value: settings.useFixedMaxWidth,
+          onChanged: (bool newVal) {
+            settings.useFixedMaxWidth = newVal;
+            settings.save();
+          },
+        ),
       ],
     );
 

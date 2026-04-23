@@ -51,12 +51,45 @@ class MarkdownRenderer extends StatelessWidget {
 
     // Copied from MarkdownStyleSheet except Grey is replaced with Highlight color
     // p is changed
+    // Apply text scale from settings
+    var textScale = settings.textScale;
+
     var markdownStyleSheet = MarkdownStyleSheet.fromTheme(theme).copyWith(
-      p: NoteBodyEditor.textStyle(context),
+      p: NoteBodyEditor.textStyle(context)?.copyWith(
+        fontSize: (theme.textTheme.bodyMedium?.fontSize ?? 14.0) * textScale,
+      ),
       code: theme.textTheme.bodyMedium!.copyWith(
         backgroundColor: theme.dialogTheme.backgroundColor,
         fontFamily: 'monospace',
-        fontSize: theme.textTheme.bodyMedium!.fontSize! * 0.85,
+        fontSize: theme.textTheme.bodyMedium!.fontSize! * 0.85 * textScale,
+      ),
+      h1: theme.textTheme.headlineLarge?.copyWith(
+        fontSize: (theme.textTheme.headlineLarge?.fontSize ?? 32.0) * textScale,
+      ),
+      h2: theme.textTheme.headlineMedium?.copyWith(
+        fontSize: (theme.textTheme.headlineMedium?.fontSize ?? 24.0) * textScale,
+      ),
+      h3: theme.textTheme.headlineSmall?.copyWith(
+        fontSize: (theme.textTheme.headlineSmall?.fontSize ?? 20.0) * textScale,
+      ),
+      h4: theme.textTheme.titleLarge?.copyWith(
+        fontSize: (theme.textTheme.titleLarge?.fontSize ?? 18.0) * textScale,
+      ),
+      h5: theme.textTheme.titleMedium?.copyWith(
+        fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16.0) * textScale,
+      ),
+      h6: theme.textTheme.titleSmall?.copyWith(
+        fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14.0) * textScale,
+      ),
+      listBullet: theme.textTheme.bodyMedium?.copyWith(
+        fontSize: (theme.textTheme.bodyMedium?.fontSize ?? 14.0) * textScale,
+      ),
+      tableHead: theme.textTheme.bodyMedium?.copyWith(
+        fontSize: (theme.textTheme.bodyMedium?.fontSize ?? 14.0) * textScale,
+        fontWeight: FontWeight.bold,
+      ),
+      tableBody: theme.textTheme.bodyMedium?.copyWith(
+        fontSize: (theme.textTheme.bodyMedium?.fontSize ?? 14.0) * textScale,
       ),
       tableBorder: TableBorder.all(color: theme.highlightColor, width: 0),
       tableCellsDecoration: BoxDecoration(
@@ -75,8 +108,12 @@ class MarkdownRenderer extends StatelessWidget {
         color: theme.primaryColorLight,
         borderRadius: BorderRadius.circular(2.0),
       ),
+      blockquote: theme.textTheme.bodyMedium?.copyWith(
+        fontSize: (theme.textTheme.bodyMedium?.fontSize ?? 14.0) * textScale,
+      ),
       checkbox: theme.textTheme.bodyMedium!.copyWith(
         color: isDark ? theme.primaryColorLight : theme.primaryColor,
+        fontSize: (theme.textTheme.bodyMedium?.fontSize ?? 14.0) * textScale,
       ),
     );
 

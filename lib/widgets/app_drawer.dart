@@ -7,10 +7,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:git_setup/screens.dart';
-import 'package:gitjournal/account/login_screen.dart';
+// HIDDEN - Login feature disabled
+// import 'package:gitjournal/account/login_screen.dart';
 import 'package:gitjournal/analytics/analytics.dart';
 import 'package:gitjournal/folder_listing/view/folder_listing.dart';
-import 'package:gitjournal/iap/purchase_screen.dart';
+// UNLOCKED BUILD - Purchase removed
+// import 'package:gitjournal/iap/purchase_screen.dart';
 import 'package:gitjournal/l10n.dart';
 import 'package:gitjournal/logger/logger.dart';
 import 'package:gitjournal/repository_manager.dart';
@@ -18,15 +20,19 @@ import 'package:gitjournal/screens/error_screen.dart';
 import 'package:gitjournal/screens/home_screen.dart';
 import 'package:gitjournal/screens/tag_listing.dart';
 import 'package:gitjournal/settings/app_config.dart';
-import 'package:gitjournal/settings/bug_report.dart';
+// HIDDEN - Bug report, Feedback removed
+// import 'package:gitjournal/settings/bug_report.dart';
 import 'package:gitjournal/settings/settings_screen.dart';
 import 'package:gitjournal/widgets/app_drawer_header.dart';
 import 'package:gitjournal/widgets/pro_overlay.dart';
-import 'package:launch_app_store/launch_app_store.dart';
+// HIDDEN - Rate us removed
+// import 'package:launch_app_store/launch_app_store.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
+// HIDDEN - Share removed
+// import 'package:share_plus/share_plus.dart';
 import 'package:time/time.dart';
-import 'package:universal_io/io.dart' show Platform;
+// HIDDEN - Platform check for Rate removed
+// import 'package:universal_io/io.dart' show Platform;
 
 class AppDrawer extends StatefulWidget {
   @override
@@ -146,30 +152,33 @@ class _AppDrawerState extends State<AppDrawer>
           // If they are multiple show the current one which a tick mark
           _buildRepoList(),
           if (setupGitButton != null) ...[setupGitButton, divider],
-          if (!appConfig.proMode)
-            _buildDrawerTile(
-              context,
-              icon: Icons.power,
-              title: context.loc.drawerPro,
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, PurchaseScreen.routePath);
-
-                logEvent(
-                  Event.PurchaseScreenOpen,
-                  parameters: {"from": "drawer"},
-                );
-              },
-            ),
-          if (appConfig.experimentalAccounts)
-            _buildDrawerTile(
-              context,
-              icon: Icons.account_circle,
-              title: context.loc.drawerLogin,
-              onTap: () => _navTopLevel(context, LoginPage.routePath),
-              selected: currentRoute == LoginPage.routePath,
-            ),
-          if (!appConfig.proMode) divider,
+          // UNLOCKED BUILD - Purchase button removed
+          // if (!appConfig.proMode)
+          //   _buildDrawerTile(
+          //     context,
+          //     icon: Icons.power,
+          //     title: context.loc.drawerPro,
+          //     onTap: () {
+          //       Navigator.pop(context);
+          //       Navigator.pushNamed(context, PurchaseScreen.routePath);
+          //
+          //       logEvent(
+          //         Event.PurchaseScreenOpen,
+          //         parameters: {"from": "drawer"},
+          //       );
+          //     },
+          //   ),
+          // HIDDEN - Login feature disabled
+          // if (appConfig.experimentalAccounts)
+          //   _buildDrawerTile(
+          //     context,
+          //     icon: Icons.account_circle,
+          //     title: context.loc.drawerLogin,
+          //     onTap: () => _navTopLevel(context, LoginPage.routePath),
+          //     selected: currentRoute == LoginPage.routePath,
+          //   ),
+          // UNLOCKED BUILD - Divider removed
+          // if (!appConfig.proMode) divider,
           if (repo != null)
             _buildDrawerTile(
               context,
@@ -196,50 +205,51 @@ class _AppDrawerState extends State<AppDrawer>
               selected: currentRoute == TagListingScreen.routePath,
             ),
           divider,
-          _buildDrawerTile(
-            context,
-            icon: Icons.share,
-            title: context.loc.drawerShare,
-            onTap: () {
-              Navigator.pop(context);
-              Share.share('Checkout GitJournal https://gitjournal.io/');
-
-              logEvent(Event.DrawerShare);
-            },
-          ),
-          if (Platform.isAndroid || Platform.isIOS)
-            _buildDrawerTile(
-              context,
-              icon: Icons.feedback,
-              title: context.loc.drawerRate,
-              onTap: () {
-                LaunchReview.launch(
-                  androidAppId: "io.gitjournal.gitjournal",
-                  iOSAppId: "1466519634",
-                );
-
-                Navigator.pop(context);
-                logEvent(Event.DrawerRate);
-              },
-            ),
-          _buildDrawerTile(
-            context,
-            icon: Icons.rate_review,
-            title: context.loc.drawerFeedback,
-            onTap: () async {
-              await createFeedback(context);
-              Navigator.pop(context);
-            },
-          ),
-          _buildDrawerTile(
-            context,
-            icon: Icons.bug_report,
-            title: context.loc.drawerBug,
-            onTap: () async {
-              await createBugReport(context);
-              Navigator.pop(context);
-            },
-          ),
+          // HIDDEN - Share, Rate, Feedback, Bug Report removed
+          // _buildDrawerTile(
+          //   context,
+          //   icon: Icons.share,
+          //   title: context.loc.drawerShare,
+          //   onTap: () {
+          //     Navigator.pop(context);
+          //     Share.share('Checkout GitJournal https://gitjournal.io/');
+          //
+          //     logEvent(Event.DrawerShare);
+          //   },
+          // ),
+          // if (Platform.isAndroid || Platform.isIOS)
+          //   _buildDrawerTile(
+          //     context,
+          //     icon: Icons.feedback,
+          //     title: context.loc.drawerRate,
+          //     onTap: () {
+          //       LaunchReview.launch(
+          //         androidAppId: "io.gitjournal.gitjournal",
+          //         iOSAppId: "1466519634",
+          //       );
+          //
+          //       Navigator.pop(context);
+          //       logEvent(Event.DrawerRate);
+          //     },
+          //   ),
+          // _buildDrawerTile(
+          //   context,
+          //   icon: Icons.rate_review,
+          //   title: context.loc.drawerFeedback,
+          //   onTap: () async {
+          //     await createFeedback(context);
+          //     Navigator.pop(context);
+          //   },
+          // ),
+          // _buildDrawerTile(
+          //   context,
+          //   icon: Icons.bug_report,
+          //   title: context.loc.drawerBug,
+          //   onTap: () async {
+          //     await createBugReport(context);
+          //     Navigator.pop(context);
+          //   },
+          // ),
           if (repo != null)
             _buildDrawerTile(
               context,

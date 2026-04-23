@@ -139,15 +139,20 @@ class _EditorScaffoldState extends State<EditorScaffold> {
     var settings = context.watch<Settings>();
 
     var responsiveBody = LayoutBuilder(builder: (context, constraints) {
-      // FIXME: This shouldn't depend on the font
-      var ch = textSize('0', NoteBodyEditor.textStyle(context));
-      var maxWidth = ch.width * 65;
-
       var body = _editingMode
           ? widget.body
           : NoteViewer(note: note, parentFolder: widget.parentFolder);
 
       body = Scrollbar(child: body);
+
+      // Use full width if setting disabled (good for tablets)
+      if (!settings.useFixedMaxWidth) {
+        return body;
+      }
+
+      // FIXME: This shouldn't depend on the font
+      var ch = textSize('0', NoteBodyEditor.textStyle(context));
+      var maxWidth = ch.width * 65;
 
       if (constraints.maxWidth <= maxWidth) {
         return body;
@@ -183,6 +188,23 @@ class _EditorScaffoldState extends State<EditorScaffold> {
                   extraButton: widget.extraButton,
                   allowEdits: _editingMode,
                   onEditingModeChange: _switchMode,
+                  onDecreaseTextSize: () {
+                    var settings = context.read<Settings>();
+                    settings.textScale =
+                        (settings.textScale - settings.textScaleStep)
+                            .clamp(0.5, 3.0);
+                    settings.save();
+                    setState(() {});
+                  },
+                  onIncreaseTextSize: () {
+                    var settings = context.read<Settings>();
+                    settings.textScale =
+                        (settings.textScale + settings.textScaleStep)
+                            .clamp(0.5, 3.0);
+                    settings.save();
+                    setState(() {});
+                  },
+                  textScale: settings.textScale,
                 ),
               ),
             if (_findMode)

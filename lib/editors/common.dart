@@ -73,6 +73,9 @@ class EditorAppBar extends StatelessWidget implements PreferredSizeWidget {
   final IconButton? extraButton;
   final bool allowEdits;
   final Func0<void> onEditingModeChange;
+  final VoidCallback? onDecreaseTextSize;
+  final VoidCallback? onIncreaseTextSize;
+  final double? textScale;
 
   const EditorAppBar({
     super.key,
@@ -82,6 +85,9 @@ class EditorAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.allowEdits,
     required this.onEditingModeChange,
     this.extraButton,
+    this.onDecreaseTextSize,
+    this.onIncreaseTextSize,
+    this.textScale,
   }) : preferredSize = const Size.fromHeight(kToolbarHeight);
 
   @override
@@ -99,6 +105,31 @@ class EditorAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: <Widget>[
         if (extraButton != null) extraButton!,
+        // Text size buttons - in both view and edit mode
+        if (onDecreaseTextSize != null)
+          IconButton(
+            icon: const Text(
+              'A−',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            tooltip: 'Decrease text size',
+            onPressed: onDecreaseTextSize,
+          ),
+        if (onIncreaseTextSize != null)
+          IconButton(
+            icon: const Text(
+              'A+',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            tooltip: 'Increase text size',
+            onPressed: onIncreaseTextSize,
+          ),
         IconButton(
           icon: allowEdits
               ? const Icon(Icons.remove_red_eye)

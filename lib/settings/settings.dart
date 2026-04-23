@@ -65,6 +65,13 @@ class Settings extends ChangeNotifier with SettingsSharedPref {
 
   String locale = Platform.localeName;
 
+  // Text size settings
+  double textScale = 1.0;
+  double textScaleStep = 0.1;
+
+  // Layout settings
+  bool useFixedMaxWidth = true;
+
   void load() {
     defaultNewNoteFolderSpec =
         getString("defaultNewNoteFolderSpec") ?? defaultNewNoteFolderSpec;
@@ -103,6 +110,13 @@ class Settings extends ChangeNotifier with SettingsSharedPref {
     hardWrap = getBool("hardWrap") ?? hardWrap;
     customMetaData = getString("customMetaData") ?? customMetaData;
     locale = getString("locale") ?? locale;
+
+    // Text size settings
+    textScale = getDouble("textScale") ?? textScale;
+    textScaleStep = getDouble("textScaleStep") ?? textScaleStep;
+
+    // Layout settings
+    useFixedMaxWidth = getBool("useFixedMaxWidth") ?? useFixedMaxWidth;
   }
 
   Future<void> save() async {
@@ -147,6 +161,13 @@ class Settings extends ChangeNotifier with SettingsSharedPref {
 
     await setBool("hardWrap", hardWrap, def.hardWrap);
     await setString("locale", locale, def.locale);
+
+    // Text size settings
+    await setDouble("textScale", textScale, def.textScale);
+    await setDouble("textScaleStep", textScaleStep, def.textScaleStep);
+
+    // Layout settings
+    await setBool("useFixedMaxWidth", useFixedMaxWidth, def.useFixedMaxWidth);
 
     notifyListeners();
   }

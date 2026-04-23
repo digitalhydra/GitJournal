@@ -6,6 +6,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:gitjournal/l10n.dart';
+import 'package:gitjournal/settings/settings.dart';
+import 'package:provider/provider.dart';
 
 class NoteBodyEditor extends StatelessWidget {
   final TextEditingController textController;
@@ -45,6 +47,9 @@ class NoteBodyEditor extends StatelessWidget {
 
   static TextStyle textStyle(BuildContext context) {
     var theme = Theme.of(context);
-    return theme.textTheme.titleMedium!;
+    var settings = context.watch<Settings>();
+    return theme.textTheme.titleMedium!.copyWith(
+      fontSize: theme.textTheme.titleMedium!.fontSize! * settings.textScale,
+    );
   }
 }

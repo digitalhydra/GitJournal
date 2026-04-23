@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import 'dart:io' show Platform;
+// HIDDEN - Platform check for Pro/Beta banner removed
+// import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -12,7 +13,8 @@ import 'package:function_types/function_types.dart';
 import 'package:gitjournal/l10n.dart';
 import 'package:gitjournal/repository.dart';
 import 'package:gitjournal/repository_manager.dart';
-import 'package:gitjournal/settings/app_config.dart';
+// HIDDEN - Pro/Beta banner removed
+// import 'package:gitjournal/settings/app_config.dart';
 import 'package:gitjournal/settings/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:time/time.dart';
@@ -26,7 +28,8 @@ class AppDrawerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var appConfig = context.watch<AppConfig>();
+    // HIDDEN - Pro/Beta banner removed, appConfig no longer needed
+    // var appConfig = context.watch<AppConfig>();
 
     var top = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -67,17 +70,20 @@ class AppDrawerHeader extends StatelessWidget {
       ),
     );
 
-    if (!appConfig.proMode) {
-      return header;
-    }
+    // HIDDEN - Pro/Beta banner removed
+    // if (!appConfig.proMode) {
+    //   return header;
+    // }
 
-    var isDesktop = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
-    return Banner(
-      message: isDesktop ? context.loc.beta : context.loc.pro,
-      location: BannerLocation.topStart,
-      color: Theme.of(context).colorScheme.secondary,
-      child: header,
-    );
+    // var isDesktop = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
+    // return Banner(
+    //   message: isDesktop ? context.loc.beta : context.loc.pro,
+    //   location: BannerLocation.topStart,
+    //   color: Theme.of(context).colorScheme.secondary,
+    //   child: header,
+    // );
+
+    return header;
   }
 }
 
