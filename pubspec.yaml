@@ -99,6 +99,7 @@ dependencies:
   uuid: ^4.2.1
   yaml: ^3.1.0
   yaml_serializer: ^0.0.12
+  yaml_writer: ^2.0.0
   archive: ^3.6.1
   flutter_bloc: ^8.1.6
   bloc: ^8.1.4
