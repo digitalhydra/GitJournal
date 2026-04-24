@@ -95,8 +95,8 @@ class GitHub implements GitHost {
       throw GitHostException.MissingAccessCode;
     }
 
-    var url =
-        Uri.parse("https://api.github.com/user/repos?page=1&per_page=100");
+    var url = Uri.parse(
+        "https://api.github.com/user/repos?type=all&page=1&per_page=100");
     var headers = {
       HttpHeaders.authorizationHeader: _buildAuthHeader(),
     };
