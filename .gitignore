@@ -67,3 +67,6 @@ debugSymbols
 # Linux Building
 /AppDir
 appimage-builder-cache/
+/android/app/debug.keystore
+/android/app/secrets/key.properties
+/android/secrets/debug.keystore
