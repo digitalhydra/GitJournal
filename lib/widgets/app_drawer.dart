@@ -11,6 +11,7 @@ import 'package:git_setup/screens.dart';
 // import 'package:gitjournal/account/login_screen.dart';
 import 'package:gitjournal/analytics/analytics.dart';
 import 'package:gitjournal/folder_listing/view/folder_listing.dart';
+import 'package:gitjournal/folder_views/folder_view.dart';
 // UNLOCKED BUILD - Purchase removed
 // import 'package:gitjournal/iap/purchase_screen.dart';
 import 'package:gitjournal/l10n.dart';
@@ -223,8 +224,8 @@ class _AppDrawerState extends State<AppDrawer>
                 context,
                 icon: Icons.star,
                 title: folder.publicName,
-                onTap: () => _navTopLevel(context, HomeScreen.routePath),
-                selected: currentRoute == HomeScreen.routePath,
+                onTap: () => _openFolder(context, folder),
+                selected: false,
               );
             }).toList(),
           ] else if (repo != null) ...[
@@ -380,6 +381,18 @@ class RepoTile extends StatelessWidget {
       child: tile,
     );
   }
+}
+
+void _openFolder(BuildContext context, dynamic folder) {
+  Navigator.pop(context);
+
+  var route = MaterialPageRoute(
+    builder: (context) => FolderView(
+      notesFolder: folder,
+    ),
+    settings: const RouteSettings(name: '/folder/'),
+  );
+  Navigator.push(context, route);
 }
 
 void _navTopLevel(BuildContext context, String toRoute) {
