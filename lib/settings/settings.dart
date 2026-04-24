@@ -77,6 +77,9 @@ class Settings extends ChangeNotifier with SettingsSharedPref {
   // Layout settings
   bool useFixedMaxWidth = true;
 
+  // Favorite folders (max 10)
+  List<String> favoriteFolders = [];
+
   void load() {
     defaultNewNoteFolderSpec =
         getString("defaultNewNoteFolderSpec") ?? defaultNewNoteFolderSpec;
@@ -122,6 +125,9 @@ class Settings extends ChangeNotifier with SettingsSharedPref {
 
     // Layout settings
     useFixedMaxWidth = getBool("useFixedMaxWidth") ?? useFixedMaxWidth;
+
+    // Favorite folders
+    favoriteFolders = getStringList("favoriteFolders") ?? favoriteFolders;
   }
 
   Future<void> save() async {
@@ -173,6 +179,9 @@ class Settings extends ChangeNotifier with SettingsSharedPref {
 
     // Layout settings
     await setBool("useFixedMaxWidth", useFixedMaxWidth, def.useFixedMaxWidth);
+
+    // Favorite folders
+    await setStringList("favoriteFolders", favoriteFolders, def.favoriteFolders);
 
     notifyListeners();
   }

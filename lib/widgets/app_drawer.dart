@@ -22,6 +22,7 @@ import 'package:gitjournal/screens/tag_listing.dart';
 import 'package:gitjournal/settings/app_config.dart';
 // HIDDEN - Bug report, Feedback removed
 // import 'package:gitjournal/settings/bug_report.dart';
+import 'package:gitjournal/settings/settings.dart';
 import 'package:gitjournal/settings/settings_screen.dart';
 import 'package:gitjournal/widgets/app_drawer_header.dart';
 import 'package:gitjournal/widgets/pro_overlay.dart';
@@ -113,6 +114,7 @@ class _AppDrawerState extends State<AppDrawer>
     var repoManager = context.watch<RepositoryManager>();
     var repo = repoManager.currentRepo;
     var appConfig = context.watch<AppConfig>();
+    var settings = context.watch<Settings>();
     var textStyle = Theme.of(context).textTheme.bodyLarge;
     var currentRoute = ModalRoute.of(context)!.settings.name;
 
@@ -204,6 +206,37 @@ class _AppDrawerState extends State<AppDrawer>
               onTap: () => _navTopLevel(context, TagListingScreen.routePath),
               selected: currentRoute == TagListingScreen.routePath,
             ),
+          // Favorite Folders Section
+          if (repo != null && settings.favoriteFolders.isNotEmpty) ...[
+            divider,
+            _buildDrawerTile(
+              context,
+              icon: Icons.star,
+              title: "Favorites",
+              onTap: () {},
+              selected: false,
+            ),
+            ...settings.favoriteFolders.map((folderPath) {
+              var folder = repo.rootFolder.getFolderWithSpec(folderPath);
+              if (folder == null) return const SizedBox.shrink();
+              return _buildDrawerTile(
+                context,
+                icon: Icons.star,
+                title: folder.publicName,
+                onTap: () => _navTopLevel(context, HomeScreen.routePath),
+                selected: currentRoute == HomeScreen.routePath,
+              );
+            }).toList(),
+          ] else if (repo != null) ...[
+            divider,
+            _buildDrawerTile(
+              context,
+              icon: Icons.star_border,
+              title: "No favorites yet",
+              onTap: () => _navTopLevel(context, FolderListingScreen.routePath),
+              selected: false,
+            ),
+          ],
           divider,
           // HIDDEN - Share, Rate, Feedback, Bug Report removed
           // _buildDrawerTile(

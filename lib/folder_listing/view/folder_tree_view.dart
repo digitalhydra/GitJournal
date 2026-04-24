@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:function_types/function_types.dart';
 import 'package:gitjournal/folder_listing/model/folder_listing_model.dart';
 import 'package:gitjournal/l10n.dart';
+import 'package:gitjournal/settings/settings.dart';
+import 'package:provider/provider.dart';
 
 typedef FolderSelectedCallback = void Function(FolderListingFolder folder);
 
@@ -85,27 +87,108 @@ class FolderTileState extends State<FolderTile> {
         GestureDetector(
           child: _buildFolderTile(),
           onTap: () => widget.onTap(widget.folder),
-          onLongPress: () => widget.onLongPress(widget.folder),
+          onLongPress: () => _showFolderMenu(context),
         ),
         _getChild(),
       ],
     );
   }
 
+  void _showFolderMenu(BuildContext context) {
+    final settings = context.read<Settings>();
+    final folder = widget.folder;
+    
+    // Don't show menu for root folder
+    if (folder.path.isEmpty) return;
+    
+    var isFavorite = settings.favoriteFolders.contains(folder.path);
+    var canAddMore = settings.favoriteFolders.length < 10;
+    
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            title: Text(folder.publicName),
+            subtitle: Text(folder.path),
+            leading: const Icon(Icons.folder),
+          ),
+          const Divider(),
+          if (isFavorite)
+            ListTile(
+              leading: const Icon(Icons.star_border),
+              title: const Text("Remove from favorites"),
+              onTap: () {
+                settings.favoriteFolders.remove(folder.path);
+                settings.save();
+                Navigator.pop(context);
+              },
+            )
+          else if (canAddMore)
+            ListTile(
+              leading: Icon(Icons.star, color: Theme.of(context).colorScheme.primary),
+              title: const Text("Add to favorites"),
+              onTap: () {
+                settings.favoriteFolders.add(folder.path);
+                settings.save();
+                Navigator.pop(context);
+              },
+            )
+          else
+            const ListTile(
+              leading: Icon(Icons.star, color: Colors.grey),
+              title: Text("Favorites limit reached (10 max)"),
+              enabled: false,
+            ),
+          ListTile(
+            leading: const Icon(Icons.check_circle_outline),
+            title: const Text("Select folder"),
+            onTap: () {
+              Navigator.pop(context);
+              widget.onLongPress(folder);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFolderTile() {
     var folder = widget.folder;
     var ic = _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down;
-    var trailling = folder.hasSubFolders
-        ? IconButton(
-            icon: Icon(ic),
-            onPressed: expand,
-          )
-        : null;
-
+    
     final subtitle = context.loc
         .widgetsFolderTreeViewNotesCount(folder.noteCount.toString());
 
     final theme = Theme.of(context);
+    final settings = context.watch<Settings>();
+    
+    var isFavorite = settings.favoriteFolders.contains(folder.path);
+    var canBeFavorite = folder.path.isNotEmpty; // Root folder can't be favorite
+    
+    // Build trailing widgets
+    var trailingWidgets = <Widget>[];
+    
+    // Star icon for favorites
+    if (isFavorite) {
+      trailingWidgets.add(
+        Icon(
+          Icons.star,
+          color: theme.colorScheme.primary,
+        ),
+      );
+    }
+    
+    // Expand/collapse button
+    if (folder.hasSubFolders) {
+      trailingWidgets.add(
+        IconButton(
+          icon: Icon(ic),
+          onPressed: expand,
+        ),
+      );
+    }
 
     var selected = widget.selectedPath == widget.folder.path;
     return Card(
@@ -121,10 +204,20 @@ class FolderTileState extends State<FolderTile> {
             color: Theme.of(context).colorScheme.secondary,
           ),
         ),
-        title:
-            Text(folder.publicName.isEmpty ? "Root Folder" : folder.publicName),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(folder.publicName.isEmpty ? "Root Folder" : folder.publicName),
+            ),
+          ],
+        ),
         subtitle: Text(subtitle),
-        trailing: trailling,
+        trailing: trailingWidgets.isNotEmpty 
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: trailingWidgets,
+              )
+            : null,
         selected: selected,
       ),
     );
