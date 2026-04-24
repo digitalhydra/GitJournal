@@ -127,7 +127,7 @@ class Themes {
     primaryColorLight: const Color(0xFF00ffc8),
     primaryColorDark: const Color(0xFF123e7c),
     hintColor: const Color(0xFF711c91),
-    highlightColor: const Color(0xFFd300c4),
+    highlightColor: const Color(0xFF123e7c), // Dark blue for selected items (contrasts with magenta text)
     dividerColor: const Color(0xFF123e7c),
     textSelectionTheme: const TextSelectionThemeData(
       cursorColor: Color(0xFF0abdc6),
@@ -186,7 +186,7 @@ class Themes {
     primaryColorLight: const Color(0xFF9dff00),
     primaryColorDark: const Color(0xFF1D1833),
     hintColor: const Color(0xFFc592ff),
-    highlightColor: const Color(0xFFff004c),
+    highlightColor: const Color(0xFF1D1833), // Dark purple for selected items (contrasts with pink text)
     dividerColor: const Color(0xFF1D1833),
     textSelectionTheme: const TextSelectionThemeData(
       cursorColor: Color(0xFF00ff9c),
@@ -245,7 +245,7 @@ class Themes {
     primaryColorLight: const Color(0xFF39ff14),
     primaryColorDark: const Color(0xFF1a0b2e),
     hintColor: const Color(0xFFbf00ff),
-    highlightColor: const Color(0xFFff0080),
+    highlightColor: const Color(0xFF1a0b2e), // Dark purple for selected items (contrasts with pink text)
     dividerColor: const Color(0xFF1a0b2e),
     textSelectionTheme: const TextSelectionThemeData(
       cursorColor: Color(0xFF00ffc8),
