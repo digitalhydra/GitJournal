@@ -231,12 +231,10 @@ class SettingsUIScreen extends StatelessWidget {
         return "Light Default";
       case DEFAULT_DARK_THEME_NAME:
         return "Dark Default";
-      case CYBERPUNK_NEON_THEME_NAME:
-        return "Cyberpunk Neon (Navy/Cyan)";
-      case CYBERPUNK_SCARLET_THEME_NAME:
-        return "Cyberpunk Scarlet (Purple/Green)";
-      case CYBERPUNK_UMBRA_THEME_NAME:
-        return "Cyberpunk Umbra (Dark/Balanced)";
+      case STRAWBERRY_CREAM_THEME_NAME:
+        return "Strawberry Cream (Pink/Mint)";
+      case SAGE_AND_BLUSH_THEME_NAME:
+        return "Sage & Blush (Rose/Green)";
       default:
         return themeName;
     }
@@ -246,9 +244,8 @@ class SettingsUIScreen extends StatelessWidget {
     final themes = [
       DEFAULT_LIGHT_THEME_NAME,
       DEFAULT_DARK_THEME_NAME,
-      CYBERPUNK_NEON_THEME_NAME,
-      CYBERPUNK_SCARLET_THEME_NAME,
-      CYBERPUNK_UMBRA_THEME_NAME,
+      STRAWBERRY_CREAM_THEME_NAME,
+      SAGE_AND_BLUSH_THEME_NAME,
     ];
 
     showDialog(
