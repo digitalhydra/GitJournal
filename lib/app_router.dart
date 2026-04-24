@@ -18,6 +18,7 @@ import 'package:gitjournal/folder_listing/view/folder_listing.dart';
 // import 'package:gitjournal/iap/purchase_thankyou_screen.dart';
 import 'package:gitjournal/logger/logger.dart';
 import 'package:gitjournal/repository.dart';
+import 'package:gitjournal/screens/categories/categories_screen.dart';
 import 'package:gitjournal/screens/error_screen.dart';
 import 'package:gitjournal/screens/home_screen.dart';
 import 'package:gitjournal/screens/onboarding_screens.dart';
@@ -31,9 +32,11 @@ import 'package:gitjournal/widgets/setup.dart';
 
 class AppRoute {
   static const NewNotePrefix = '/newNote/';
+  static const RecipePrefix = '/recipe/';
 
   static const all = [
     OnBoardingScreen.routePath,
+    CategoriesScreen.routePath,
     FolderListingScreen.routePath,
     TagListingScreen.routePath,
     SettingsScreen.routePath,
@@ -60,12 +63,9 @@ class AppRouter {
   });
 
   String initialRoute() {
-    var route = '/';
+    var route = CategoriesScreen.routePath;
     if (!appConfig.onBoardingCompleted) {
       route = OnBoardingScreen.routePath;
-    }
-    if (settings.homeScreen == SettingsHomeScreen.AllFolders) {
-      route = FolderListingScreen.routePath;
     }
     return route;
   }
@@ -78,9 +78,11 @@ class AppRouter {
     Func0<void> callbackIfUsedShared,
   ) {
     var route = routeSettings.name ?? "";
-    if (route == FolderListingScreen.routePath ||
+    if (route == CategoriesScreen.routePath ||
+        route == FolderListingScreen.routePath ||
         route == TagListingScreen.routePath ||
-        route.startsWith(AppRoute.NewNotePrefix)) {
+        route.startsWith(AppRoute.NewNotePrefix) ||
+        route.startsWith(AppRoute.RecipePrefix)) {
       return PageRouteBuilder(
         settings: routeSettings,
         pageBuilder: (_, __, ___) => screenForRoute(
@@ -121,6 +123,8 @@ class AppRouter {
     switch (route) {
       case HomeScreen.routePath:
         return HomeScreen();
+      case CategoriesScreen.routePath:
+        return const CategoriesScreen();
       case FolderListingScreen.routePath:
         return FolderListingScreen();
       case TagListingScreen.routePath:
@@ -146,6 +150,15 @@ class AppRouter {
       //   return PurchaseThankYouScreen();
       case ErrorScreen.routePath:
         return const ErrorScreen();
+    }
+
+    // Recipe detail route: /recipe/{recipeId}
+    if (route.startsWith(AppRoute.RecipePrefix)) {
+      var recipeId = route.substring(AppRoute.RecipePrefix.length);
+      Log.i("Opening Recipe - $recipeId");
+      // TODO: Load recipe from repository by ID and return RecipeDetailScreen
+      // For now, return CategoriesScreen as fallback
+      return const CategoriesScreen();
     }
 
     if (route.startsWith(AppRoute.NewNotePrefix)) {
