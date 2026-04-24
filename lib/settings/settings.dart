@@ -23,6 +23,11 @@ const SETTINGS_VERSION = 3;
 const DEFAULT_LIGHT_THEME_NAME = "LightDefault";
 const DEFAULT_DARK_THEME_NAME = "DarkDefault";
 
+// Cyberpunk theme names
+const CYBERPUNK_NEON_THEME_NAME = "CyberpunkNeon";
+const CYBERPUNK_SCARLET_THEME_NAME = "CyberpunkScarlet";
+const CYBERPUNK_UMBRA_THEME_NAME = "CyberpunkUmbra";
+
 const DEFAULT_BRANCH = 'main';
 
 class Settings extends ChangeNotifier with SettingsSharedPref {

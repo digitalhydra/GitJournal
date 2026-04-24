@@ -196,6 +196,18 @@ class SettingsUIScreen extends StatelessWidget {
             settings.save();
           },
         ),
+        const Divider(),
+        const SettingsHeader("Color Theme"),
+        ListTile(
+          title: const Text("Light Theme"),
+          subtitle: Text(_getThemeDisplayName(settings.lightTheme)),
+          onTap: () => _showThemePicker(context, settings, true),
+        ),
+        ListTile(
+          title: const Text("Dark Theme"),
+          subtitle: Text(_getThemeDisplayName(settings.darkTheme)),
+          onTap: () => _showThemePicker(context, settings, false),
+        ),
       ],
     );
 
@@ -210,6 +222,72 @@ class SettingsUIScreen extends StatelessWidget {
         ),
       ),
       body: list,
+    );
+  }
+
+  String _getThemeDisplayName(String themeName) {
+    switch (themeName) {
+      case DEFAULT_LIGHT_THEME_NAME:
+        return "Light Default";
+      case DEFAULT_DARK_THEME_NAME:
+        return "Dark Default";
+      case CYBERPUNK_NEON_THEME_NAME:
+        return "Cyberpunk Neon (Navy/Cyan)";
+      case CYBERPUNK_SCARLET_THEME_NAME:
+        return "Cyberpunk Scarlet (Purple/Green)";
+      case CYBERPUNK_UMBRA_THEME_NAME:
+        return "Cyberpunk Umbra (Dark/Balanced)";
+      default:
+        return themeName;
+    }
+  }
+
+  void _showThemePicker(BuildContext context, Settings settings, bool isLight) {
+    final themes = [
+      DEFAULT_LIGHT_THEME_NAME,
+      DEFAULT_DARK_THEME_NAME,
+      CYBERPUNK_NEON_THEME_NAME,
+      CYBERPUNK_SCARLET_THEME_NAME,
+      CYBERPUNK_UMBRA_THEME_NAME,
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(isLight ? "Select Light Theme" : "Select Dark Theme"),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: themes.length,
+            itemBuilder: (context, index) {
+              final theme = themes[index];
+              final isSelected = isLight
+                  ? settings.lightTheme == theme
+                  : settings.darkTheme == theme;
+              return ListTile(
+                title: Text(_getThemeDisplayName(theme)),
+                trailing: isSelected ? const Icon(Icons.check) : null,
+                onTap: () {
+                  if (isLight) {
+                    settings.lightTheme = theme;
+                  } else {
+                    settings.darkTheme = theme;
+                  }
+                  settings.save();
+                  Navigator.of(context).pop();
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
+          ),
+        ],
+      ),
     );
   }
 }
