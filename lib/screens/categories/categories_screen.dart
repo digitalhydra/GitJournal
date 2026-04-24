@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/recipe/recipe.dart';
 import '../../core/recipe/recipe_category.dart';
+import '../../core/recipe/recipe_repository_service.dart';
 import '../../repository.dart';
 import '../../widgets/categories/category_card.dart';
 import 'recipe_list_screen.dart';
@@ -66,9 +67,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   }
 
   Future<List<Recipe>> _loadRecipesFromRepo(GitJournalRepo repo) async {
-    // TODO: Implement actual recipe loading from Git repo
-    // For now return empty list
-    return [];
+    final service = RecipeRepositoryService(repoPath: repo.repoPath);
+    return await service.loadAllRecipes();
   }
 
   List<RecipeCategory> _calculateCategoryData(List<Recipe> recipes) {

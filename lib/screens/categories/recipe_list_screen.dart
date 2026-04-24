@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/recipe/recipe.dart';
 import '../../core/recipe/recipe_category.dart';
+import '../../core/recipe/recipe_repository_service.dart';
 import '../../repository.dart';
 import '../recipe_detail_screen.dart';
 
@@ -62,8 +63,8 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
   }
 
   Future<List<Recipe>> _loadRecipesFromRepo(GitJournalRepo repo) async {
-    // TODO: Implement actual recipe loading
-    return [];
+    final service = RecipeRepositoryService(repoPath: repo.repoPath);
+    return await service.loadAllRecipes();
   }
 
   @override
