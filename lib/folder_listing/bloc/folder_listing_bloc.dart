@@ -9,6 +9,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:gitjournal/folder_listing/model/folder_listing_model.dart';
 import 'package:gitjournal/repository.dart';
+import 'package:gitjournal/settings/settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'folder_listing_event.dart';
 import 'folder_listing_state.dart';
@@ -110,6 +112,9 @@ class FolderListingBloc extends Bloc<FolderListingEvent, FolderListingState> {
       }
       await repo.removeFolder(folder);
 
+      // Remove from favorites if it was a favorite
+      await _removeFromFavoritesIfNeeded(event.path);
+
       var rootFolder = convertNotesFolderFS(null, repo.rootFolder);
       emit(FolderListingLoaded(rootFolder));
     } catch (e) {
@@ -117,6 +122,21 @@ class FolderListingBloc extends Bloc<FolderListingEvent, FolderListingState> {
           .copyWith(errorMessage: e.toString())
           .resetSelectedPath();
       emit(newState);
+    }
+  }
+
+  Future<void> _removeFromFavoritesIfNeeded(String folderPath) async {
+    try {
+      var pref = await SharedPreferences.getInstance();
+      var settings = Settings(repo.id, pref);
+      settings.load();
+
+      if (settings.favoriteFolders.contains(folderPath)) {
+        settings.favoriteFolders.remove(folderPath);
+        await settings.save();
+      }
+    } catch (e) {
+      // Silently fail - favorites cleanup is not critical
     }
   }
 

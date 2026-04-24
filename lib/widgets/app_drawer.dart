@@ -119,6 +119,11 @@ class _AppDrawerState extends State<AppDrawer>
     var textStyle = Theme.of(context).textTheme.bodyLarge;
     var currentRoute = ModalRoute.of(context)!.settings.name;
 
+    // Clean up favorites - remove folders that no longer exist
+    if (repo != null) {
+      _cleanupFavorites(settings, repo);
+    }
+
     if (repo?.remoteGitRepoConfigured == false) {
       setupGitButton = ListTile(
         leading: Icon(Icons.sync, color: textStyle!.color),
@@ -329,6 +334,26 @@ class _AppDrawerState extends State<AppDrawer>
       color: selected ? theme.highlightColor : theme.scaffoldBackgroundColor,
       child: tile,
     );
+  }
+
+  void _cleanupFavorites(Settings settings, dynamic repo) {
+    // Remove favorites that no longer exist
+    var validFavorites = <String>[];
+    var changed = false;
+
+    for (var folderPath in settings.favoriteFolders) {
+      var folder = repo.rootFolder.getFolderWithSpec(folderPath);
+      if (folder != null) {
+        validFavorites.add(folderPath);
+      } else {
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      settings.favoriteFolders = validFavorites;
+      settings.save();
+    }
   }
 }
 
