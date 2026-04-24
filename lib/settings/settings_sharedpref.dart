@@ -99,4 +99,19 @@ abstract mixin class SettingsSharedPref {
       await pref.setStringList(key, value.toList());
     }
   }
+
+  @protected
+  Future<void> setStringList(
+      String key, List<String> value, List<String> defaultValue) async {
+    key = '${id}_$key';
+
+    final bool Function(List<dynamic>, List<dynamic>) eq =
+        const ListEquality().equals;
+
+    if (eq(value, defaultValue)) {
+      await pref.remove(key);
+    } else {
+      await pref.setStringList(key, value);
+    }
+  }
 }

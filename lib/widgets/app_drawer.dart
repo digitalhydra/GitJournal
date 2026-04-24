@@ -228,7 +228,7 @@ class _AppDrawerState extends State<AppDrawer>
               return _buildDrawerTile(
                 context,
                 icon: Icons.star,
-                title: folder.publicName,
+                title: folder.publicName(context),
                 onTap: () => _openFolder(context, folder),
                 selected: false,
               );
