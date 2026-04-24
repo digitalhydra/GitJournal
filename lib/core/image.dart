@@ -7,6 +7,7 @@
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:gitjournal/core/folder/notes_folder_fs.dart';
+import 'package:gitjournal/core/image_processor.dart';
 import 'package:gitjournal/editors/common.dart';
 import 'package:path/path.dart' as p;
 import 'package:universal_io/io.dart';
@@ -19,12 +20,34 @@ class Image {
 
   Image._(this.parent, this.filePath);
 
-  static Future<Image> copyIntoFs(NotesFolderFS parent, String filePath) async {
-    var hash = await _md5Hash(filePath);
-    var ext = p.extension(filePath);
+  static Future<Image> copyIntoFs(
+    NotesFolderFS parent,
+    String filePath, {
+    bool process = true,
+  }) async {
+    String finalPath = filePath;
+    String ext = p.extension(filePath);
+
+    // Process image for recipe app (512x512 WebP)
+    if (process && !ImageProcessor.isProcessedWebP(filePath)) {
+      finalPath = await ImageProcessor.process(filePath);
+      ext = ImageProcessor.extension;
+    }
+
+    var hash = await _md5Hash(finalPath);
     var imagePath = Image._buildImagePath(parent, hash.toString() + ext);
 
-    await File(filePath).copy(p.join(parent.repoPath, imagePath));
+    await File(finalPath).copy(p.join(parent.repoPath, imagePath));
+
+    // Clean up temp file if we processed it
+    if (process && finalPath != filePath) {
+      try {
+        await File(finalPath).delete();
+      } catch (_) {
+        // Ignore cleanup errors
+      }
+    }
+
     return Image._(parent, imagePath);
   }
 

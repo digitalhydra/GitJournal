@@ -33,6 +33,7 @@ dependencies:
   fast_immutable_collections: ^10.2.4
   file_picker: ^10.3.3
   fimber: ^0.6.1
+  flutter_image_compress: ^2.3.0
   fixnum: ^1.0.1
   flutter:
     sdk: flutter
