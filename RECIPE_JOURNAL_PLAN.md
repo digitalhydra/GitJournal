@@ -312,12 +312,13 @@ class Recipe {
 
 ## Implementation Phases
 
-### Phase 1: Foundation
+### Phase 1: Foundation ✅ COMPLETE
 - [x] Image optimization (512x512 WebP)
-- [ ] Recipe data model (`Recipe`, `Ingredient`)
-- [ ] Recipe serializer (YAML frontmatter)
-- [ ] Unit converter + density tables
-- [ ] Ingredient parser
+- [x] Recipe data model (`Recipe`, `Ingredient`)
+- [x] Recipe serializer (YAML frontmatter)
+- [x] Unit converter + density tables
+- [x] Ingredient parser
+- [x] 126 unit tests passing
 
 ### Phase 2: Import
 - [ ] Importer interface
