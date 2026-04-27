@@ -18,19 +18,30 @@ class UnitConverter {
   /// Liquid volume conversions (direct, no density needed)
   /// All values are: milliliters per unit
   static const Map<String, double> _liquidConversions = {
-    // Metric
+    // Metric - English
     'ml': 1.0,
     'milliliter': 1.0,
     'milliliters': 1.0,
     'l': 1000.0,
     'liter': 1000.0,
     'liters': 1000.0,
+    'litre': 1000.0,
+    'litres': 1000.0,
     'cl': 10.0,
     'centiliter': 10.0,
     'dl': 100.0,
     'deciliter': 100.0,
+    // Metric - Spanish
+    'mililitro': 1.0,
+    'mililitros': 1.0,
+    'litro': 1000.0,
+    'litros': 1000.0,
+    'centilitro': 10.0,
+    'centilitros': 10.0,
+    'decilitro': 100.0,
+    'decilitros': 100.0,
 
-    // US Customary
+    // US Customary - English
     'tsp': 4.92892,
     'teaspoon': 4.92892,
     'teaspoons': 4.92892,
@@ -53,11 +64,28 @@ class UnitConverter {
     'gal': 3785.41,
     'gallon': 3785.41,
     'gallons': 3785.41,
+    // US Customary - Spanish
+    'cucharadita': 4.92892,
+    'cucharaditas': 4.92892,
+    'cdta': 4.92892,
+    'cucharada': 14.7868,
+    'cucharadas': 14.7868,
+    'cda': 14.7868,
+    'taza': 236.588,
+    'tazas': 236.588,
+    'tz': 236.588,
+    'pinta': 473.176,
+    'pintas': 473.176,
+    'cuarto': 946.353,
+    'cuartos': 946.353,
+    'galon': 3785.41,
+    'galones': 3785.41,
   };
 
   /// Weight to volume (assuming water density: 1g = 1ml)
   /// These are approximate for general cooking
   static const Map<String, double> _weightConversions = {
+    // English
     'g': 1.0,
     'gram': 1.0,
     'grams': 1.0,
@@ -70,6 +98,20 @@ class UnitConverter {
     'lb': 453.592,
     'pound': 453.592,
     'pounds': 453.592,
+    // Spanish
+    'gr': 1.0,
+    'gramo': 1.0,
+    'gramos': 1.0,
+    'kilo': 1000.0,
+    'kilos': 1000.0,
+    'kilogramo': 1000.0,
+    'kilogramos': 1000.0,
+    'onz': 28.3495,
+    'onza': 28.3495,
+    'onzas': 28.3495,
+    'libr': 453.592,
+    'libra': 453.592,
+    'libras': 453.592,
   };
 
   /// Converts a measurement to milliliters
@@ -122,11 +164,12 @@ class UnitConverter {
 
   /// Converts a measurement to cups (for density calculations)
   double? _convertToCups(double amount, String unit) {
-    // Handle cup-based units
-    if (unit == 'cup' || unit == 'cups' || unit == 'c') {
+    // Handle cup-based units (English + Spanish)
+    if (unit == 'cup' || unit == 'cups' || unit == 'c' ||
+        unit == 'taza' || unit == 'tazas' || unit == 'tz') {
       return amount;
     }
-    
+
     // Convert other units to cups
     final ml = _liquidConversions[unit];
     if (ml != null) {

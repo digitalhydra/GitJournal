@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
 
 import '../../core/recipe/recipe.dart';
@@ -69,8 +72,6 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -178,7 +179,8 @@ class RecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+    final repo = context.read<GitJournalRepo>();
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -193,11 +195,34 @@ class RecipeCard extends StatelessWidget {
             // Image section
             Expanded(
               flex: 3,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
-                child: _buildImage(),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
+                    ),
+                    child: _buildImage(repo.repoPath),
+                  ),
+                  // Favorite indicator
+                  if (recipe.isFavorite)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withAlpha(230),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
             // Info section
@@ -263,10 +288,12 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildImage() {
+  Widget _buildImage(String repoPath) {
     if (recipe.hasImage) {
-      return Image.asset(
-        recipe.imagePath!,
+      final fullPath = p.join(repoPath, recipe.imagePath!);
+      final imageFile = File(fullPath);
+      return Image.file(
+        imageFile,
         fit: BoxFit.cover,
         width: double.infinity,
         errorBuilder: (context, error, stackTrace) {

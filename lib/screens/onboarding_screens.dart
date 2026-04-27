@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:function_types/function_types.dart';
 import 'package:gitjournal/analytics/analytics.dart';
 import 'package:gitjournal/l10n.dart';
-import 'package:gitjournal/screens/home_screen.dart';
+import 'package:gitjournal/screens/categories/categories_screen.dart';
 import 'package:gitjournal/settings/app_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -155,7 +155,7 @@ class OnBoardingScreenState extends State<OnBoardingScreen> {
     appConfig.onBoardingCompleted = true;
     appConfig.save();
 
-    Navigator.popAndPushNamed(context, HomeScreen.routePath);
+    Navigator.popAndPushNamed(context, CategoriesScreen.routePath);
   }
 
   void _nextPage() {
@@ -215,7 +215,7 @@ class OnBoardingPage1 extends StatelessWidget {
         ),
         const SizedBox(height: 16.0),
         Text(
-          "GitJournal",
+          "RecipeJournal",
           style: headerTextStyle,
         ),
       ],

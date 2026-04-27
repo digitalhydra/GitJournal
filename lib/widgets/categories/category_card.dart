@@ -4,8 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
+import 'package:provider/provider.dart';
 import '../../core/recipe/recipe_category.dart';
+import '../../repository.dart';
 
 /// Card widget for displaying a recipe category in the grid
 class CategoryCard extends StatelessWidget {
@@ -21,7 +26,7 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -38,7 +43,7 @@ class CategoryCard extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [
                 theme.colorScheme.surface,
-                theme.colorScheme.surface.withOpacity(0.8),
+                theme.colorScheme.surface.withAlpha(204),
               ],
             ),
           ),
@@ -62,7 +67,7 @@ class CategoryCard extends StatelessWidget {
               Text(
                 '${category.recipeCount} ${_getRecipeText(category.recipeCount)}',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withAlpha(178),
                 ),
               ),
             ],
@@ -75,20 +80,28 @@ class CategoryCard extends StatelessWidget {
   Widget _buildIcon(BuildContext context) {
     // If we have an image from a recipe, show it
     if (category.imagePath != null && category.imagePath!.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.network(
-          category.imagePath!,
-          width: 80,
-          height: 80,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildEmojiIcon(context);
-          },
-        ),
-      );
+      try {
+        final repo = context.read<GitJournalRepo>();
+        final fullPath = p.join(repo.repoPath, category.imagePath!);
+        final imageFile = File(fullPath);
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.file(
+            imageFile,
+            width: 80,
+            height: 80,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return _buildEmojiIcon(context);
+            },
+          ),
+        );
+      } catch (e) {
+        return _buildEmojiIcon(context);
+      }
     }
-    
+
     // Otherwise show emoji
     return _buildEmojiIcon(context);
   }

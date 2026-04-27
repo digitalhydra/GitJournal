@@ -11,7 +11,7 @@ import 'package:gitjournal/settings/settings_git_remote.dart';
 import 'package:gitjournal/widgets/app_drawer.dart';
 import 'package:provider/provider.dart';
 
-import 'home_screen.dart';
+import 'categories/categories_screen.dart';
 
 class ErrorScreen extends StatelessWidget {
   static const routePath = '/error';
@@ -69,7 +69,7 @@ class ErrorScreen extends StatelessWidget {
 
             Navigator.pop(context);
             Navigator.of(context).pushNamedAndRemoveUntil(
-              HomeScreen.routePath,
+              CategoriesScreen.routePath,
               (r) => true,
             );
           },

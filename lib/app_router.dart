@@ -79,6 +79,7 @@ class AppRouter {
   ) {
     var route = routeSettings.name ?? "";
     if (route == CategoriesScreen.routePath ||
+        route == HomeScreen.routePath ||
         route == FolderListingScreen.routePath ||
         route == TagListingScreen.routePath ||
         route.startsWith(AppRoute.NewNotePrefix) ||

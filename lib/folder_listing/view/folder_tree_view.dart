@@ -165,7 +165,6 @@ class FolderTileState extends State<FolderTile> {
     final settings = context.watch<Settings>();
     
     var isFavorite = settings.favoriteFolders.contains(folder.path);
-    var canBeFavorite = folder.path.isNotEmpty; // Root folder can't be favorite
     
     // Build trailing widgets
     var trailingWidgets = <Widget>[];

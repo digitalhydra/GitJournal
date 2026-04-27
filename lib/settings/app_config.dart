@@ -20,6 +20,7 @@ class AppConfig extends ChangeNotifier {
   //
   var onBoardingCompleted = false;
   var collectCrashReports = true;
+  var sampleRecipeHidden = false;
 
   int version = 0;
 
@@ -42,6 +43,8 @@ class AppConfig extends ChangeNotifier {
     collectCrashReports =
         pref.getBool("collectCrashReports") ?? collectCrashReports;
 
+    sampleRecipeHidden = pref.getBool("sampleRecipeHidden") ?? false;
+
     version = pref.getInt("appSettingsVersion") ?? version;
     proMode = pref.getBool("proMode") ?? proMode;
     validateProMode = pref.getBool("validateProMode") ?? validateProMode;
@@ -63,6 +66,8 @@ class AppConfig extends ChangeNotifier {
     var defaultSet = AppConfig._internal();
 
     pref.setBool("onBoardingCompleted", onBoardingCompleted);
+
+    pref.setBool("sampleRecipeHidden", sampleRecipeHidden);
 
     _setBool(pref, "collectCrashReports", collectCrashReports,
         defaultSet.collectCrashReports);

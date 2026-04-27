@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import 'package:flutter/material.dart';
-
 /// Represents a recipe category with Spanish names
 /// Categories are tag-based and hardcoded
 class RecipeCategory {

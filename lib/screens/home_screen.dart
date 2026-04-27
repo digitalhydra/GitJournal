@@ -16,7 +16,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  static const routePath = '/';
+  static const routePath = '/all-notes';
 
   @override
   _HomeScreenState createState() => _HomeScreenState();

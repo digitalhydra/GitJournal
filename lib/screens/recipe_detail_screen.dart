@@ -4,11 +4,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:path/path.dart' as p;
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/recipe/recipe.dart';
-import '../cook_mode_screen.dart';
+import '../../core/recipe/recipe_repository_service.dart';
+import '../../core/recipe/recipe_serializer.dart';
+import '../../repository.dart';
+import '../../settings/app_config.dart';
+import 'editor/recipe_editor_screen.dart';
+import 'cook_mode_screen.dart';
 
 /// Screen showing full recipe details
 /// Focus: Ingredients and Markdown body (notes/instructions)
@@ -55,12 +65,29 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       appBar: AppBar(
         title: Text(_displayedRecipe.title),
         actions: [
+          if (widget.recipe.id == RecipeRepositoryService.sampleRecipeId)
+            IconButton(
+              icon: const Icon(Icons.visibility_off),
+              tooltip: 'Ocultar ejemplo',
+              onPressed: () => _hideSampleRecipe(),
+            ),
+          IconButton(
+            icon: Icon(
+              _displayedRecipe.isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: _displayedRecipe.isFavorite ? Colors.red : null,
+            ),
+            tooltip: _displayedRecipe.isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos',
+            onPressed: () => _toggleFavorite(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'Compartir',
+            onPressed: () => _shareRecipe(),
+          ),
           IconButton(
             icon: const Icon(Icons.edit),
             tooltip: 'Editar',
-            onPressed: () {
-              // TODO: Navigate to edit screen
-            },
+            onPressed: () => _editRecipe(),
           ),
           IconButton(
             icon: const Icon(Icons.delete),
@@ -113,20 +140,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Small image if available (optional)
+        // Recipe image if available
         if (_displayedRecipe.hasImage) ...[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              _displayedRecipe.imagePath!,
-              height: 120,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return const SizedBox.shrink();
-              },
-            ),
-          ),
+          _buildRecipeImage(),
           const SizedBox(height: 16),
         ],
         
@@ -212,6 +228,35 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildRecipeImage() {
+    final repo = context.read<GitJournalRepo>();
+    final fullPath = p.join(repo.repoPath, _displayedRecipe.imagePath!);
+    final imageFile = File(fullPath);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.file(
+        imageFile,
+        height: 200,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: Icon(Icons.broken_image, size: 48, color: Colors.grey),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -417,10 +462,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
             child: const Text('Cancelar'),
           ),
           TextButton(
-            onPressed: () {
-              // TODO: Delete recipe
+            onPressed: () async {
               Navigator.pop(context);
-              Navigator.pop(context); // Go back to list
+              await _deleteRecipe();
             },
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.error,
@@ -432,12 +476,115 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     );
   }
 
+  void _hideSampleRecipe() async {
+    final appConfig = context.read<AppConfig>();
+    appConfig.sampleRecipeHidden = true;
+    await appConfig.save();
+    
+    if (mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ejemplo ocultado')),
+      );
+    }
+  }
+
+  Future<void> _deleteRecipe() async {
+    try {
+      final repo = context.read<GitJournalRepo>();
+      final service = RecipeRepositoryService(repoPath: repo.repoPath);
+      await service.deleteRecipe(widget.recipe);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Receta eliminada')),
+      );
+      Navigator.pop(context); // Go back to list
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al eliminar: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    try {
+      final repo = context.read<GitJournalRepo>();
+      final service = RecipeRepositoryService(repoPath: repo.repoPath);
+
+      // Toggle favorite status
+      final updatedRecipe = widget.recipe.copyWith(
+        isFavorite: !widget.recipe.isFavorite,
+      );
+
+      // Save to repository (delete old, save new)
+      await service.deleteRecipe(widget.recipe);
+      await service.saveRecipe(updatedRecipe);
+
+      if (!mounted) return;
+
+      setState(() {
+        _displayedRecipe = updatedRecipe;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            updatedRecipe.isFavorite
+                ? 'Agregado a favoritos'
+                : 'Quitado de favoritos',
+          ),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  void _editRecipe() {
+    final repo = context.read<GitJournalRepo>();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecipeEditorScreen(
+          recipe: widget.recipe,
+          repoPath: repo.repoPath,
+        ),
+      ),
+    ).then((saved) {
+      if (saved == true) {
+        // Refresh the screen if recipe was saved
+        Navigator.pop(context);
+      }
+    });
+  }
+
   void _openCookMode() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CookModeScreen(recipe: _displayedRecipe),
       ),
+    );
+  }
+
+  void _shareRecipe() {
+    final markdown = RecipeSerializer.encode(_displayedRecipe);
+    Share.share(
+      markdown,
+      subject: _displayedRecipe.title,
     );
   }
 }

@@ -137,7 +137,7 @@ class Themes {
       selectionHandleColor: Color(0xFFFFB7B2),
       selectionColor: Color(0xFFFFE5E5),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: const Color(0xFFFFFFFF),
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -209,7 +209,7 @@ class Themes {
       selectionHandleColor: Color(0xFFD4A5A5),
       selectionColor: Color(0xFFE8D4D4),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: const Color(0xFFFFFFFF),
       elevation: 2,
       shape: RoundedRectangleBorder(

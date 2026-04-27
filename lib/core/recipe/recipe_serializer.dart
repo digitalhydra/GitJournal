@@ -81,6 +81,10 @@ class RecipeSerializer {
       buffer.writeln('image: "${recipe.imagePath}"');
     }
     
+    if (recipe.isFavorite) {
+      buffer.writeln('favorite: true');
+    }
+    
     if (recipe.ingredients.isNotEmpty) {
       buffer.writeln('ingredients:');
       for (final ing in recipe.ingredients) {
@@ -197,6 +201,7 @@ class RecipeSerializer {
       servings: yaml['servings'] as int?,
       difficulty: yaml['difficulty'] as String?,
       imagePath: yaml['image'] as String?,
+      isFavorite: yaml['favorite'] == true,
       created: created,
       modified: modified,
     );

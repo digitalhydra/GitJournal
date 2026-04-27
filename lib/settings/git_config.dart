@@ -26,9 +26,9 @@ class GitConfig extends ChangeNotifier
   final SharedPreferences pref;
 
   @override
-  var gitAuthor = "GitJournal";
+  var gitAuthor = "RecipeJournal";
   @override
-  var gitAuthorEmail = "app@gitjournal.io";
+  var gitAuthorEmail = "app@recipejournal.io";
   @override
   var sshPublicKey = "";
   @override

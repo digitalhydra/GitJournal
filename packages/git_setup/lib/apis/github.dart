@@ -95,31 +95,45 @@ class GitHub implements GitHost {
       throw GitHostException.MissingAccessCode;
     }
 
-    var url = Uri.parse(
-        "https://api.github.com/user/repos?type=all&page=1&per_page=100");
-    var headers = {
-      HttpHeaders.authorizationHeader: _buildAuthHeader(),
-    };
-
-    if (foundation.kDebugMode) {
-      Log.d(toCurlCommand(url, headers));
-    }
-
-    var response = await http.get(url, headers: headers);
-    if (response.statusCode != 200) {
-      Log.e("Github listRepos: Invalid response " +
-          response.statusCode.toString() +
-          ": " +
-          response.body);
-      throw GitHostException.HttpResponseFail;
-    }
-
-    List<dynamic> list = jsonDecode(response.body);
+    // Fetch all repos including private ones
+    // Use affiliation=owner to get repos user owns (includes private)
+    // Also add pagination to get more than 100 repos
     var repos = <GitHostRepo>[];
-    for (var d in list) {
-      var map = Map<String, dynamic>.from(d);
-      var repo = repoFromJson(map);
-      repos.add(repo);
+    var page = 1;
+    const perPage = 100;
+    
+    while (true) {
+      var url = Uri.parse(
+          "https://api.github.com/user/repos?affiliation=owner&type=all&page=$page&per_page=$perPage");
+      var headers = {
+        HttpHeaders.authorizationHeader: _buildAuthHeader(),
+      };
+
+      if (foundation.kDebugMode) {
+        Log.d(toCurlCommand(url, headers));
+      }
+
+      var response = await http.get(url, headers: headers);
+      if (response.statusCode != 200) {
+        Log.e("Github listRepos: Invalid response " +
+            response.statusCode.toString() +
+            ": " +
+            response.body);
+        throw GitHostException.HttpResponseFail;
+      }
+
+      List<dynamic> list = jsonDecode(response.body);
+      if (list.isEmpty) break;
+      
+      for (var d in list) {
+        var map = Map<String, dynamic>.from(d);
+        var repo = repoFromJson(map);
+        repos.add(repo);
+      }
+      
+      // If we got less than perPage, no more pages
+      if (list.length < perPage) break;
+      page++;
     }
 
     // FIXME: Sort these based on some criteria

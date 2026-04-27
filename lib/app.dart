@@ -33,6 +33,9 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_io/io.dart' show Directory, Platform;
+import 'screens/import/import_review_screen.dart';
+import 'importers/tiktok_importer.dart';
+import 'importers/markdown_importer.dart';
 
 class JournalApp extends StatefulWidget {
   static Future<void> main(SharedPreferences pref) async {
@@ -186,8 +189,55 @@ class JournalAppState extends State<JournalApp> {
     _sharedImages = [];
     _sharedText = "";
 
-    // if (value.startsWith('gitjournal-identity://')) return;
+    // Collect all text/URL shares first
+    final sharedTexts = <String>[];
+    for (var m in media) {
+      if (m.type == SharedMediaType.url || m.type == SharedMediaType.text) {
+        sharedTexts.add(m.path);
+      }
+    }
 
+    // Check for TikTok URLs first
+    final tiktokImporter = TikTokImporter();
+    String? tiktokUrl;
+
+    for (var text in sharedTexts) {
+      if (tiktokImporter.canHandle(text)) {
+        tiktokUrl = text;
+        break;
+      }
+    }
+
+    // If TikTok URL found, route to import review
+    if (tiktokUrl != null) {
+      Log.i("Detected TikTok URL share: $tiktokUrl");
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _navigateToImportReview(sourceUrl: tiktokUrl!);
+      });
+      return;
+    }
+
+    // Check for Markdown content (AI-parsed recipes, etc.)
+    final markdownImporter = MarkdownImporter();
+    String? markdownContent;
+
+    for (var text in sharedTexts) {
+      if (markdownImporter.canHandle(text)) {
+        markdownContent = text;
+        break;
+      }
+    }
+
+    // If Markdown content found, route to import review
+    if (markdownContent != null) {
+      Log.i("Detected Markdown content share");
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _navigateToImportReview(markdownContent: markdownContent!);
+      });
+      return;
+    }
+
+    // Handle normal shares (images, text, non-TikTok URLs)
     for (var m in media) {
       switch (m.type) {
         case SharedMediaType.image:
@@ -216,6 +266,21 @@ class JournalAppState extends State<JournalApp> {
       Log.d("Received Media Share $m");
     }
     WidgetsBinding.instance.addPostFrameCallback(_handleShare);
+  }
+
+  void _navigateToImportReview({String? sourceUrl, String? markdownContent}) {
+    final repo = widget.repoManager.currentRepo;
+    if (repo == null) return;
+
+    _navigatorKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (context) => ImportReviewScreen(
+          sourceUrl: sourceUrl,
+          markdownContent: markdownContent,
+          repoPath: repo.repoPath,
+        ),
+      ),
+    );
   }
 
   void _initShareSubscriptions() {

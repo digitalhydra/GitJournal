@@ -10,8 +10,7 @@ import 'package:git_setup/screens.dart';
 // HIDDEN - Login feature disabled
 // import 'package:gitjournal/account/login_screen.dart';
 import 'package:gitjournal/analytics/analytics.dart';
-import 'package:gitjournal/folder_listing/view/folder_listing.dart';
-import 'package:gitjournal/folder_views/folder_view.dart';
+
 // UNLOCKED BUILD - Purchase removed
 // import 'package:gitjournal/iap/purchase_screen.dart';
 import 'package:gitjournal/l10n.dart';
@@ -19,8 +18,14 @@ import 'package:gitjournal/logger/logger.dart';
 import 'package:gitjournal/repository_manager.dart';
 import 'package:gitjournal/screens/error_screen.dart';
 import 'package:gitjournal/screens/home_screen.dart';
-import 'package:gitjournal/screens/tag_listing.dart';
-import 'package:gitjournal/settings/app_config.dart';
+import 'package:gitjournal/screens/categories/categories_screen.dart';
+import 'package:gitjournal/screens/categories/recipe_list_screen.dart';
+import 'package:gitjournal/screens/search/recipe_search_screen.dart';
+import 'package:gitjournal/core/recipe/recipe_category.dart';
+import 'package:gitjournal/screens/menu/weekly_menu_list_screen.dart';
+import 'package:gitjournal/screens/menu/grocery_list_quick_screen.dart';
+import 'package:gitjournal/screens/editor/recipe_editor_screen.dart';
+
 // HIDDEN - Bug report, Feedback removed
 // import 'package:gitjournal/settings/bug_report.dart';
 import 'package:gitjournal/settings/settings.dart';
@@ -114,7 +119,6 @@ class _AppDrawerState extends State<AppDrawer>
     Widget? setupGitButton;
     var repoManager = context.watch<RepositoryManager>();
     var repo = repoManager.currentRepo;
-    var appConfig = context.watch<AppConfig>();
     var settings = context.watch<Settings>();
     var textStyle = Theme.of(context).textTheme.bodyLarge;
     var currentRoute = ModalRoute.of(context)!.settings.name;
@@ -187,59 +191,119 @@ class _AppDrawerState extends State<AppDrawer>
           //   ),
           // UNLOCKED BUILD - Divider removed
           // if (!appConfig.proMode) divider,
-          if (repo != null)
+          // 📍 Main Navigation
+          if (repo != null) ...[
+            _buildSectionHeader(context, "Navegación Principal"),
             _buildDrawerTile(
               context,
-              icon: Icons.note,
-              title: context.loc.drawerAll,
+              icon: Icons.home,
+              title: "Inicio",
+              onTap: () => _navTopLevel(context, CategoriesScreen.routePath),
+              selected: currentRoute == CategoriesScreen.routePath,
+            ),
+            _buildDrawerTile(
+              context,
+              icon: Icons.search,
+              title: "Buscar Recetas",
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RecipeSearchScreen(),
+                  ),
+                );
+              },
+              selected: false,
+            ),
+            _buildDrawerTile(
+              context,
+              icon: Icons.favorite,
+              title: "Favoritos",
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RecipeListScreen(
+                      category: RecipeCategory(
+                        id: 'favoritos',
+                        name: 'Favoritos',
+                        icon: '❤️',
+                        tags: ['favoritos', 'favorite'],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              selected: false,
+            ),
+            _buildDrawerTile(
+              context,
+              icon: Icons.calendar_view_week,
+              title: "Menús Semanales",
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WeeklyMenuListScreen(),
+                  ),
+                );
+              },
+              selected: false,
+            ),
+            _buildDrawerTile(
+              context,
+              icon: Icons.shopping_cart,
+              title: "Lista de Compras",
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const GroceryListQuickScreen(),
+                  ),
+                );
+              },
+              selected: false,
+            ),
+          ],
+          // 📂 Organization Section
+          if (repo != null) ...[
+            _buildSectionHeader(context, "Organización"),
+            _buildCategoriesExpansionTile(context),
+            _buildDrawerTile(
+              context,
+              icon: Icons.format_list_bulleted,
+              title: "Todas las Recetas",
               onTap: () => _navTopLevel(context, HomeScreen.routePath),
               selected: currentRoute == HomeScreen.routePath,
             ),
-          if (repo != null)
+          ],
+          divider,
+          // ⚡ Quick Actions
+          if (repo != null) ...[
+            _buildSectionHeader(context, "Acciones Rápidas"),
             _buildDrawerTile(
               context,
-              icon: Icons.folder,
-              title: context.loc.drawerFolders,
-              onTap: () => _navTopLevel(context, FolderListingScreen.routePath),
-              selected: currentRoute == FolderListingScreen.routePath,
-            ),
-          if (repo != null)
-            _buildDrawerTile(
-              context,
-              icon: FontAwesomeIcons.tag,
-              isFontAwesome: true,
-              title: context.loc.drawerTags,
-              onTap: () => _navTopLevel(context, TagListingScreen.routePath),
-              selected: currentRoute == TagListingScreen.routePath,
-            ),
-          // Favorite Folders Section
-          if (repo != null && settings.favoriteFolders.isNotEmpty) ...[
-            divider,
-            _buildDrawerTile(
-              context,
-              icon: Icons.star,
-              title: "Favorites",
-              onTap: () {},
-              selected: false,
-            ),
-            ...settings.favoriteFolders.map((folderPath) {
-              var folder = repo.rootFolder.getFolderWithSpec(folderPath);
-              if (folder == null) return const SizedBox.shrink();
-              return _buildDrawerTile(
-                context,
-                icon: Icons.star,
-                title: folder.publicName(context),
-                onTap: () => _openFolder(context, folder),
-                selected: false,
-              );
-            }).toList(),
-          ] else if (repo != null) ...[
-            divider,
-            _buildDrawerTile(
-              context,
-              icon: Icons.star_border,
-              title: "No favorites yet",
-              onTap: () => _navTopLevel(context, FolderListingScreen.routePath),
+              icon: Icons.add_circle,
+              title: "Nueva Receta",
+              onTap: () {
+                Navigator.pop(context);
+                final repoManager = context.read<RepositoryManager>();
+                final repo = repoManager.currentRepo;
+                if (repo != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RecipeEditorScreen(
+                        repoPath: repo.repoPath,
+                      ),
+                    ),
+                  );
+                }
+              },
               selected: false,
             ),
           ],
@@ -303,6 +367,58 @@ class _AppDrawerState extends State<AppDrawer>
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Text(
+        title.toUpperCase(),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.primary,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoriesExpansionTile(BuildContext context) {
+    final iconMap = <String, IconData>{
+      'desayuno': Icons.wb_sunny,
+      'almuerzo': Icons.wb_cloudy,
+      'cena': Icons.nights_stay,
+      'postres': Icons.cake,
+      'panaderia': Icons.bakery_dining,
+      'bebidas': Icons.local_cafe,
+      'snacks': Icons.fastfood,
+      'sopas': Icons.soup_kitchen,
+      'ensaladas': Icons.eco,
+      'aperitivos': Icons.tapas,
+    };
+
+    return ExpansionTile(
+      leading: const Icon(Icons.category),
+      title: const Text("Categorías"),
+      children: defaultCategories.map((cat) {
+        return ListTile(
+          leading: Icon(iconMap[cat.id] ?? Icons.restaurant_menu),
+          title: Text(cat.name),
+          dense: true,
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RecipeListScreen(
+                  category: cat,
+                ),
+              ),
+            );
+          },
+        );
+      }).toList(),
     );
   }
 
@@ -395,7 +511,7 @@ class RepoTile extends StatelessWidget {
         }
 
         Navigator.of(context).pushNamedAndRemoveUntil(
-          HomeScreen.routePath,
+          CategoriesScreen.routePath,
           (r) => true,
         );
       },
@@ -408,17 +524,7 @@ class RepoTile extends StatelessWidget {
   }
 }
 
-void _openFolder(BuildContext context, dynamic folder) {
-  Navigator.pop(context);
 
-  var route = MaterialPageRoute(
-    builder: (context) => FolderView(
-      notesFolder: folder,
-    ),
-    settings: const RouteSettings(name: '/folder/'),
-  );
-  Navigator.push(context, route);
-}
 
 void _navTopLevel(BuildContext context, String toRoute) {
   var fromRoute = ModalRoute.of(context)!.settings.name;

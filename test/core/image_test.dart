@@ -19,6 +19,7 @@ import 'package:universal_io/io.dart' as io;
 import '../lib.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(gjSetupAllTests);
 
   late NotesFolderFS rootFolder;
@@ -43,7 +44,7 @@ void main() {
       imagePath = p.join(currentDir.path, 'test/testdata/icon.png');
     }
 
-    image = await core.Image.copyIntoFs(rootFolder, imagePath);
+    image = await core.Image.copyIntoFs(rootFolder, imagePath, process: false);
   });
 
   test('Insert at end', () {

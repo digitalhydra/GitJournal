@@ -7,11 +7,6 @@
 import 'dart:convert';
 
 import 'package:html/dom.dart';
-import 'package:html/parser.dart';
-
-import '../core/ingredients/ingredient_parser.dart';
-import '../core/ingredients/parse_exception.dart';
-import 'recipe_importer.dart';
 
 /// Parses recipe data from schema.org JSON-LD structured data
 class SchemaOrgParser {

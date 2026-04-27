@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import 'package:gitjournal/core/ingredients/density_table.dart';
 import 'package:gitjournal/core/ingredients/unit_converter.dart';
 import 'package:gitjournal/utils/decimal_formatter.dart';
 
@@ -25,9 +24,9 @@ class IngredientParser {
   IngredientParser({UnitConverter? converter})
       : _converter = converter ?? UnitConverter();
 
-  /// Common cooking units to recognize
+  /// Common cooking units to recognize (English + Spanish)
   static final Set<String> _units = {
-    // Volume - US
+    // Volume - US (English)
     'cup', 'cups', 'c',
     'tbsp', 'tablespoon', 'tablespoons', 'tbs',
     'tsp', 'teaspoon', 'teaspoons',
@@ -35,17 +34,30 @@ class IngredientParser {
     'pt', 'pint', 'pints',
     'qt', 'quart', 'quarts',
     'gal', 'gallon', 'gallons',
+    // Volume - Spanish
+    'taza', 'tazas', 'tz',
+    'cucharada', 'cucharadas', 'cda',
+    'cucharadita', 'cucharaditas', 'cdta',
+    'onzas', 'onza fluida', 'onzas fluidas',
+    'pinta', 'pintas',
+    'cuarto', 'cuartos',
+    'galon', 'galones',
     // Volume - Metric
-    'ml', 'milliliter', 'milliliters',
-    'l', 'liter', 'liters', 'litre', 'litres',
-    'cl', 'centiliter', 'centiliters',
-    'dl', 'deciliter', 'deciliters',
-    // Weight
+    'ml', 'milliliter', 'milliliters', 'mililitro', 'mililitros',
+    'l', 'liter', 'liters', 'litre', 'litres', 'litro', 'litros',
+    'cl', 'centiliter', 'centiliters', 'centilitro', 'centilitros',
+    'dl', 'deciliter', 'deciliters', 'decilitro', 'decilitros',
+    // Weight - English
     'g', 'gram', 'grams',
     'kg', 'kilogram', 'kilograms',
     'oz', 'ounce', 'ounces',
     'lb', 'lbs', 'pound', 'pounds',
-    // Count
+    // Weight - Spanish
+    'gr', 'gramo', 'gramos',
+    'kilo', 'kilos', 'kilogramo', 'kilogramos',
+    'onza',
+    'libra', 'libras',
+    // Count - English
     'piece', 'pieces',
     'slice', 'slices',
     'clove', 'cloves',
@@ -56,7 +68,17 @@ class IngredientParser {
     'bunch', 'bunches',
     'head', 'heads',
     'package', 'packages', 'pkg',
-    'ounce', 'ounces',
+    // Count - Spanish
+    'pieza', 'piezas', 'pedazo', 'pedazos',
+    'rebanada', 'rebanadas',
+    'diente', 'dientes',
+    'barra', 'barras',
+    'pizca', 'pizcas',
+    'chorrito', 'chorritos',
+    'lata', 'latas',
+    'manojo', 'manojos',
+    'cabeza', 'cabezas',
+    'paquete', 'paquetes', 'pqte',
   };
 
   /// Parses an ingredient string

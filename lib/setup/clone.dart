@@ -65,7 +65,7 @@ Future<void> cloneRemotePluggable({
   // since it's clearly buggy
   if (await _repoIsEmpty(repoPath)) {
     Directory(repoPath).deleteSync(recursive: true);
-    return await gitCloneFn(
+    await gitCloneFn(
       cloneUrl: cloneUrl,
       repoPath: repoPath,
       sshPublicKey: sshPublicKey,
@@ -73,6 +73,7 @@ Future<void> cloneRemotePluggable({
       sshPassword: sshPassword,
       statusFile: statusFile,
     );
+    return;
   }
 
   var repo = await GitAsyncRepository.load(repoPath);

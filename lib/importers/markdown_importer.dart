@@ -237,9 +237,9 @@ class MarkdownImporter implements RecipeImporter {
   List<Ingredient> _extractIngredientsFromBody(String content) {
     final ingredients = <Ingredient>[];
 
-    // Look for "Ingredients" header
+    // Look for "Ingredients" or "Ingredientes" header (English + Spanish)
     final pattern = RegExp(
-      r'##?\s*ingredients?\s*\n+((?:[\s\S]*?))(?=##?|$)',
+      r'##?\s*(?:ingredients?|ingredientes)\s*\n+((?:[\s\S]*?))(?=##?|$)',
       caseSensitive: false,
     );
     
@@ -275,9 +275,9 @@ class MarkdownImporter implements RecipeImporter {
   List<String> _extractInstructionsFromBody(String content) {
     final instructions = <String>[];
 
-    // Look for "Instructions", "Directions", or "Steps" header
+    // Look for "Instructions", "Directions", "Steps" or Spanish variants
     final pattern = RegExp(
-      r'##?\s*(?:instructions?|directions?|steps?)\s*\n+((?:[\s\S]*?))(?=##?|$)',
+      r'##?\s*(?:instructions?|directions?|steps?|instrucciones?|preparaci[óo]n|pasos?)\s*\n+((?:[\s\S]*?))(?=##?|$)',
       caseSensitive: false,
     );
     

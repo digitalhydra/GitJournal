@@ -20,6 +20,7 @@ class Recipe {
   int? servings;
   String? difficulty; // easy, medium, hard
   String? imagePath;  // Relative path to image in repo
+  bool isFavorite;    // User's favorite flag
   DateTime created;
   DateTime modified;
 
@@ -34,6 +35,7 @@ class Recipe {
     this.servings,
     this.difficulty,
     this.imagePath,
+    this.isFavorite = false,
     DateTime? created,
     DateTime? modified,
   })  : id = id ?? const Uuid().v4(),
@@ -131,6 +133,7 @@ class Recipe {
     int? servings,
     String? difficulty,
     String? imagePath,
+    bool? isFavorite,
     DateTime? modified,
   }) {
     return Recipe(
@@ -144,6 +147,7 @@ class Recipe {
       servings: servings ?? this.servings,
       difficulty: difficulty ?? this.difficulty,
       imagePath: imagePath ?? this.imagePath,
+      isFavorite: isFavorite ?? this.isFavorite,
       created: created,
       modified: modified ?? DateTime.now(),
     );
@@ -160,6 +164,7 @@ class Recipe {
     int? servings,
     String? difficulty,
     String? imagePath,
+    bool? isFavorite,
   }) {
     if (title != null) this.title = title;
     if (body != null) this.body = body;
@@ -170,6 +175,7 @@ class Recipe {
     if (servings != null) this.servings = servings;
     if (difficulty != null) this.difficulty = difficulty;
     if (imagePath != null) this.imagePath = imagePath;
+    if (isFavorite != null) this.isFavorite = isFavorite;
     modified = DateTime.now();
   }
 

@@ -7,11 +7,14 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
 
-import '../core/recipe/recipe.dart';
-import '../core/recipe/recipe_serializer.dart';
+import '../ingredients/ingredient.dart';
+import 'recipe.dart';
+import 'recipe_serializer.dart';
 
 /// Service for loading and managing recipes from the Git repository
 class RecipeRepositoryService {
+  static const String sampleRecipeId = 'sample-recipe-guid';
+  
   final String repoPath;
 
   RecipeRepositoryService({required this.repoPath});
@@ -107,5 +110,50 @@ class RecipeRepositoryService {
     // Add timestamp to ensure uniqueness
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     return '${sanitized}_$timestamp';
+  }
+  
+  /// Creates a sample recipe if none exists
+  Future<void> createSampleRecipeIfNeeded() async {
+    // Check if sample already exists
+    final recipes = await loadAllRecipes();
+    final hasSample = recipes.any((r) => r.id == sampleRecipeId);
+    if (hasSample) return;
+    
+    // Create sample recipe
+    final sampleRecipe = Recipe(
+      id: sampleRecipeId,
+      title: 'Ejemplo: Pasta Básica',
+      body: '''# Pasta Básica
+
+Receta de ejemplo para mostrar la estructura.
+
+## Preparación
+
+1. Hervir agua con sal
+2. Agregar la pasta
+3. Cocer por 8-10 minutos
+4. Escorar y servir
+
+## Notas
+
+- Esta es una receta de ejemplo
+- Puedes editarla o eliminarla
+- Los archivos se guardan en formato Markdown
+''',
+      ingredients: const [
+        Ingredient(name: 'pasta', amount: 400, unit: 'g'),
+        Ingredient(name: 'agua', amount: 4, unit: 'litros'),
+        Ingredient(name: 'sal', amount: 2, unit: 'cdas'),
+      ],
+      tags: const ['ejemplo', 'pasta'],
+      prepTime: 5,
+      cookTime: 10,
+      servings: 4,
+      difficulty: 'fácil',
+      created: DateTime(2024, 1, 1),
+      modified: DateTime(2024, 1, 1),
+    );
+    
+    await saveRecipe(sampleRecipe);
   }
 }

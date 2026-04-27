@@ -121,7 +121,7 @@ class TikTokImporter implements RecipeImporter {
   /// Extracts title from meta tags
   String? _extractTitle(String html) {
     final match = RegExp(
-      r'<meta[^>]*property=["\']og:title["\'][^>]*content=["\']([^"\']*)',
+      r"""<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']*)""",
       caseSensitive: false,
     ).firstMatch(html);
     return match?.group(1);
@@ -131,7 +131,7 @@ class TikTokImporter implements RecipeImporter {
   String? _extractDescription(String html) {
     // Try og:description first
     var match = RegExp(
-      r'<meta[^>]*property=["\']og:description["\'][^>]*content=["\']([^"\']*)',
+      r"""<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']*)""",
       caseSensitive: false,
     ).firstMatch(html);
     
@@ -139,7 +139,7 @@ class TikTokImporter implements RecipeImporter {
     
     // Fallback to regular description
     match = RegExp(
-      r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)',
+      r"""<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)""",
       caseSensitive: false,
     ).firstMatch(html);
     
@@ -149,7 +149,7 @@ class TikTokImporter implements RecipeImporter {
   /// Extracts thumbnail URL from meta tags
   String? _extractThumbnail(String html) {
     final match = RegExp(
-      r'<meta[^>]*property=["\']og:image["\'][^>]*content=["\']([^"\']*)',
+      r"""<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']*)""",
       caseSensitive: false,
     ).firstMatch(html);
     return match?.group(1);
@@ -177,9 +177,9 @@ class TikTokImporter implements RecipeImporter {
       title = lines.first.trim();
     }
 
-    // Look for "Ingredients:" marker
+    // Look for "Ingredients:" or "Ingredientes:" marker (English + Spanish)
     final ingredientsMatch = RegExp(
-      r'ingredients?:?\s*([^\n]+(?:\n[^\n]+)*?)(?=instructions?|directions?|steps?|$)',
+      r'(?:ingredients?|ingredientes):?\s*([^\n]+(?:\n[^\n]+)*?)(?=instructions?|directions?|steps?|instrucciones?|preparación?|preparacion?|$)',
       caseSensitive: false,
     ).firstMatch(cleanCaption);
 
@@ -200,9 +200,9 @@ class TikTokImporter implements RecipeImporter {
       }
     }
 
-    // Look for "Instructions:" or "Directions:" marker
+    // Look for "Instructions:" or "Directions:" marker (English + Spanish)
     final instructionsMatch = RegExp(
-      r'(?:instructions?|directions?|steps?):?\s*(.+?)(?=#|$)',
+      r'(?:instructions?|directions?|steps?|instrucciones?|preparación?|preparacion?|pasos?):?\s*(.+?)(?=#|$)',
       caseSensitive: false,
       dotAll: true,
     ).firstMatch(cleanCaption);

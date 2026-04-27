@@ -11,13 +11,19 @@ import '../../core/recipe/recipe.dart';
 import '../../core/recipe/recipe_category.dart';
 import '../../core/recipe/recipe_repository_service.dart';
 import '../../repository.dart';
+import '../../settings/app_config.dart';
+import '../../widgets/app_drawer.dart';
 import '../../widgets/categories/category_card.dart';
+import '../editor/recipe_editor_screen.dart';
+import '../menu/weekly_menu_list_screen.dart';
+import '../recipe_detail_screen.dart';
+import '../search/recipe_search_screen.dart';
 import 'recipe_list_screen.dart';
 
 /// Main screen showing grid of recipe categories
 /// Entry point for browsing recipes
 class CategoriesScreen extends StatefulWidget {
-  static const routePath = '/categories';
+  static const routePath = '/';
 
   const CategoriesScreen({super.key});
 
@@ -27,7 +33,9 @@ class CategoriesScreen extends StatefulWidget {
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
   List<RecipeCategory> _categories = [];
+  List<Recipe> _allRecipes = [];
   bool _isLoading = true;
+  bool _showFavoritesOnly = false;
 
   @override
   void initState() {
@@ -37,20 +45,25 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   Future<void> _loadCategories() async {
     setState(() => _isLoading = true);
-    
+
     try {
       // Get repository from context
       final repo = context.read<GitJournalRepo>();
-      
+
       // Load all recipes from Git repo
       final recipes = await _loadRecipesFromRepo(repo);
-      
+
+      // Store all recipes for favorites filtering
+      setState(() {
+        _allRecipes = recipes;
+      });
+
       // Calculate recipe counts and images for each category
       final categoriesWithCounts = _calculateCategoryData(recipes);
-      
+
       // Filter out empty categories
       final activeCategories = getActiveCategories(categoriesWithCounts);
-      
+
       setState(() {
         _categories = activeCategories;
         _isLoading = false;
@@ -68,7 +81,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   Future<List<Recipe>> _loadRecipesFromRepo(GitJournalRepo repo) async {
     final service = RecipeRepositoryService(repoPath: repo.repoPath);
-    return await service.loadAllRecipes();
+    
+    // Create sample recipe if not exists
+    await service.createSampleRecipeIfNeeded();
+    
+    // Load all recipes
+    final recipes = await service.loadAllRecipes();
+    
+    // Filter sample recipe if hidden
+    final appConfig = context.read<AppConfig>();
+    if (appConfig.sampleRecipeHidden) {
+      return recipes.where((r) => r.id != RecipeRepositoryService.sampleRecipeId).toList();
+    }
+    
+    return recipes;
   }
 
   List<RecipeCategory> _calculateCategoryData(List<Recipe> recipes) {
@@ -96,12 +122,53 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
     return Scaffold(
+      drawer: AppDrawer(),
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         title: const Text('Mis Recetas'),
         actions: [
+          IconButton(
+            icon: Icon(
+              _showFavoritesOnly ? Icons.favorite : Icons.favorite_border,
+              color: _showFavoritesOnly ? Colors.red : null,
+            ),
+            tooltip: _showFavoritesOnly ? 'Mostrar todas' : 'Mostrar favoritos',
+            onPressed: () {
+              setState(() {
+                _showFavoritesOnly = !_showFavoritesOnly;
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: 'Buscar',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RecipeSearchScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.calendar_view_week),
+            tooltip: 'Menús Semanales',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const WeeklyMenuListScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -115,9 +182,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         onRefresh: _loadCategories,
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : _categories.isEmpty
-                ? _buildEmptyState()
-                : _buildCategoryGrid(),
+            : _showFavoritesOnly
+                ? _buildFavoritesList()
+                : _categories.isEmpty
+                    ? _buildEmptyState()
+                    : _buildCategoryGrid(),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -192,6 +261,72 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
+  Widget _buildFavoritesList() {
+    final favoriteRecipes = _allRecipes.where((r) => r.isFavorite).toList();
+
+    if (favoriteRecipes.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.favorite_border,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No hay favoritos',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Marca recetas como favoritas para verlas aquí',
+              style: TextStyle(color: Colors.grey[500]),
+            ),
+            const SizedBox(height: 24),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _showFavoritesOnly = false;
+                });
+              },
+              child: const Text('Ver todas las recetas'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth > 600 ? 3 : 2;
+
+        return GridView.builder(
+          padding: const EdgeInsets.all(16),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            childAspectRatio: 0.75,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: favoriteRecipes.length,
+          itemBuilder: (context, index) {
+            final recipe = favoriteRecipes[index];
+            return RecipeCard(
+              recipe: recipe,
+              onTap: () => _onRecipeTap(recipe),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _onCategoryTap(RecipeCategory category) {
     Navigator.push(
       context,
@@ -199,6 +334,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         builder: (context) => RecipeListScreen(category: category),
       ),
     );
+  }
+
+  void _onRecipeTap(Recipe recipe) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecipeDetailScreen(recipe: recipe),
+      ),
+    ).then((_) => _loadCategories());
   }
 
   void _showAddRecipeOptions() {
@@ -213,7 +357,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               title: const Text('Escribir manualmente'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Navigate to recipe editor
+                final repo = context.read<GitJournalRepo>();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RecipeEditorScreen(
+                      repoPath: repo.repoPath,
+                    ),
+                  ),
+                ).then((_) => _loadCategories());
               },
             ),
             ListTile(

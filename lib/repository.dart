@@ -42,6 +42,35 @@ import 'package:time/time.dart';
 import 'package:universal_io/io.dart' as io;
 import 'package:universal_io/io.dart' show Platform;
 
+// Sample recipe for new empty repos
+const String _sampleRecipeContent = '''---
+id: "sample-recipe"
+title: "Ejemplo: Mi Primera Receta"
+ingredients:
+  - name: "ingrediente ejemplo"
+    amount: 1.0
+    unit: "taza"
+---
+
+# Mi Primera Receta
+
+Esta es una receta de ejemplo para mostrarte cómo estructurar tu receta.
+
+## Ingredientes
+- 1 taza de ingrediente ejemplo
+- 2 cdas de otro ingrediente
+
+## Preparación
+
+1. Primer paso de la preparación
+2. Segundo paso
+3. Tercer paso
+
+## Notas
+
+Puedes editar esta receta o crear una nueva.
+''';
+
 class GitJournalRepo with ChangeNotifier {
   final RepositoryManager repoManager;
   final StorageConfig storageConfig;
@@ -883,7 +912,7 @@ Future<void> _copyDirectory(String source, String destination) async {
   }
 }
 
-/// Add a GitIgnore file if no file is present. This way we always at least have
+/// Add a sample recipe file if no file is present. This way we always at least have
 /// one commit. It makes doing a git pull and push easier
 Future<void> _ensureOneCommitInRepo({
   required String repoPath,
@@ -895,14 +924,14 @@ Future<void> _ensureOneCommitInRepo({
       (fs) => fs.statSync().type == io.FileSystemEntityType.file,
     );
     if (anyFileInRepo == null) {
-      Log.i("Adding .ignore file");
-      var ignoreFile = io.File(p.join(repoPath, ".gitignore"));
-      ignoreFile.createSync();
-
+      Log.i("Adding sample recipe file");
+      var sampleFile = io.File(p.join(repoPath, "ejemplo-receta.md"));
+      sampleFile.writeAsStringSync(_sampleRecipeContent);
+      
       var repo = await GitAsyncRepository.load(repoPath);
-      await repo.add(".gitignore");
+      await repo.add("ejemplo-receta.md");
       await repo.commit(
-        message: "Add gitignore file",
+        message: "Add sample recipe",
         author: GitAuthor(
           name: config.gitAuthor,
           email: config.gitAuthorEmail,
